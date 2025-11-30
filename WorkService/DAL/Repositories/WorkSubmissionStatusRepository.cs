@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,6 +16,22 @@ namespace DAL.Repositories
         public WorkSubmissionStatusRepository(IDbConnectionFactory connectionFactory) : base(connectionFactory, "work_submission_statuses")
         {
 
+        }
+
+        public async Task<WorkSubmissionStatus?> GetByNameAsync(string name, CancellationToken cancellationToken = default)
+        {
+            using IDbConnection conn = await GetOpenConnectionAsync();
+            string sql = $"SELECT * FROM {tableName} WHERE name = @Name LIMIT 1";
+
+            IEnumerable<WorkSubmissionStatus> result = await conn.QueryAsync<WorkSubmissionStatus>(
+                new CommandDefinition(
+                    sql,
+                    new { Name = name },
+                    cancellationToken: cancellationToken
+                )
+            );
+
+            return result.FirstOrDefault();
         }
 
         public async Task<bool> IsNameUniqueAsync(string name, Guid? idToExclude = null, CancellationToken cancellationToken = default)

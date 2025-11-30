@@ -6,7 +6,14 @@ using DAL.Repositories;
 using DAL.Repositories.Interfaces;
 using DAL.Seeder;
 using DAL.Unit_of_work;
+using FluentValidation.AspNetCore;
+using FluentValidation;
 using Microsoft.AspNetCore.Connections;
+using BLL.FluentValidation.Status;
+using BLL.Mapper;
+using Microsoft.OpenApi.Models;
+using System.Reflection;
+using API.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,11 +33,26 @@ builder.Services.AddScoped<ISubmissionDeliveryMethodService, SubmissionDeliveryM
 builder.Services.AddScoped<IWorkSubmissionStatusService, WorkSubmissionStatusService>();
 builder.Services.AddScoped<IWorkSubmissionService, WorkSubmissionService>();
 
+builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddValidatorsFromAssemblyContaining<WorkSubmissionStatusCreateDtoValidator>();
+
+builder.Services.AddAutoMapper(cfg =>
+{
+    cfg.AddMaps(typeof(WorkSubmissionProfile).Assembly);
+});
 
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
+
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "CatalogService", Version = "v1" });
+
+    string xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    string xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    c.IncludeXmlComments(xmlPath);
+});
 
 var app = builder.Build();
 
@@ -54,6 +76,8 @@ using (var scope = app.Services.CreateScope())
         throw;
     }
 }
+
+app.UseMiddleware<ExceptionMiddleware>();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

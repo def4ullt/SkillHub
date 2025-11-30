@@ -14,7 +14,6 @@ namespace BLL.DTO.WorkSubmission
         public Guid UserId { get; set; }
         public string? UserFirstName { get; set; }
         public string? UserLastName { get; set; }
-        public Guid StatusId { get; set; }
         public List<WorkSubmissionFileCreateDto>? Files { get; set; }
     }
 }

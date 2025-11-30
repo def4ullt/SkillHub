@@ -23,6 +23,8 @@ namespace BLL.Mapper
 
             CreateMap<WorkSubmissionUpdateDto, WorkSubmission>();
 
+            CreateMap<WorkSubmissionFile, WorkSubmissionFileReadDto>();
+
             CreateMap<WorkSubmissionFileCreateDto, WorkSubmissionFile>();
             CreateMap<WorkSubmissionFileUpdateDto, WorkSubmissionFile>();
         }

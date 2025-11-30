@@ -27,19 +27,33 @@ namespace BLL.Services
 
         public async Task<WorkSubmissionReadDto> CreateAsync(WorkSubmissionCreateDto dto, CancellationToken cancellationToken = default)
         {
-            WorkSubmissionStatus? status = await unitOfWork.WorkSubmissionStatuses.GetByIdAsync(dto.StatusId, cancellationToken);
-            if (status == null)
+            WorkSubmissionStatus? pendingStatus = await unitOfWork.WorkSubmissionStatuses.GetByNameAsync("Pending", cancellationToken);
+            if (pendingStatus == null)
             {
-                throw new NotFoundException(nameof(WorkSubmissionStatus), dto.StatusId);
+                throw new NotFoundException(nameof(WorkSubmissionStatus), Guid.NewGuid());
+            }
+
+            if (dto.Files != null)
+            {
+                foreach (WorkSubmissionFileCreateDto fileDto in dto.Files)
+                {
+                    SubmissionDeliveryMethod? delivery = await unitOfWork.SubmissionDeliveryMethods.GetByIdAsync(fileDto.DeliveryMethodId, cancellationToken);
+
+                    if (delivery == null)
+                    {
+                        throw new NotFoundException(nameof(SubmissionDeliveryMethod), fileDto.DeliveryMethodId);
+                    }
+                }
             }
 
             WorkSubmission? entity = mapper.Map<WorkSubmission>(dto);
+            entity.StatusId = pendingStatus.Id;
 
             Guid id = await unitOfWork.WorkSubmissions.AddAsync(entity, cancellationToken);
 
             if (dto.Files != null)
             {
-                foreach (var fileDto in dto.Files)
+                foreach (WorkSubmissionFileCreateDto fileDto in dto.Files)
                 {
                     WorkSubmissionFile file = mapper.Map<WorkSubmissionFile>(fileDto);
                     file.WorkSubmissionId = id;
@@ -51,6 +65,7 @@ namespace BLL.Services
 
             return mapper.Map<WorkSubmissionReadDto>(entity);
         }
+
 
         public async Task<WorkSubmissionDetailDto?> GetDetailAsync(Guid id, CancellationToken cancellationToken = default)
         {
@@ -75,6 +90,20 @@ namespace BLL.Services
             if (status == null)
             {
                 throw new NotFoundException(nameof(WorkSubmissionStatus), dto.StatusId);
+            }
+
+            if (dto.Files != null)
+            {
+                foreach (WorkSubmissionFileUpdateDto fileDto in dto.Files)
+                {
+                    SubmissionDeliveryMethod? delivery = await unitOfWork.SubmissionDeliveryMethods
+                        .GetByIdAsync(fileDto.DeliveryMethodId, cancellationToken);
+
+                    if (delivery == null)
+                    {
+                        throw new NotFoundException(nameof(SubmissionDeliveryMethod), fileDto.DeliveryMethodId);
+                    }
+                }
             }
 
             entity.StatusId = dto.StatusId;
@@ -102,8 +131,7 @@ namespace BLL.Services
             return mapper.Map<WorkSubmissionReadDto>(updated);
         }
 
-
-        public async Task<bool> DeleteAsync(Guid id, CancellationToken cancellationToken = default)
+        public async Task DeleteAsync(Guid id, CancellationToken cancellationToken = default)
         {
             WorkSubmission? entity = await unitOfWork.WorkSubmissions.GetByIdAsync(id, cancellationToken);
             if (entity == null)
@@ -111,10 +139,8 @@ namespace BLL.Services
                 throw new NotFoundException(nameof(WorkSubmission), id);
             }
 
-            int affected = await unitOfWork.WorkSubmissions.DeleteAsync(id, cancellationToken);
+            await unitOfWork.WorkSubmissions.DeleteAsync(id, cancellationToken);
             await unitOfWork.CommitAsync();
-
-            return affected > 0;
         }
 
         public async Task<PagedList<WorkSubmissionReadDto>> GetPagedAsync(WorkSubmissionQueryParams queryParams, CancellationToken cancellationToken = default)

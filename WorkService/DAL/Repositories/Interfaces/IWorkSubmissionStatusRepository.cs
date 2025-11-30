@@ -9,6 +9,7 @@ namespace DAL.Repositories.Interfaces
 {
     public interface IWorkSubmissionStatusRepository : IGenericRepository<WorkSubmissionStatus>
     {
+        Task<WorkSubmissionStatus?> GetByNameAsync(string name, CancellationToken cancellationToken = default);
         Task<bool> IsNameUniqueAsync(string name, Guid? idToExclude = null, CancellationToken cancellationToken = default);
     }
 }

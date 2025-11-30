@@ -68,27 +68,64 @@ namespace DAL.Repositories
             using var conn = await GetOpenConnectionAsync();
 
             string sqlSubmission = $@"
-                SELECT ws.*, wss.id AS StatusId, wss.name AS Name
+                SELECT 
+                    ws.id,
+                    ws.taskid,
+                    ws.taskname,
+                    ws.userid,
+                    ws.userfirstname,
+                    ws.userlastname,
+                    ws.statusid,
+                    ws.submissiondate,
+                    wss.id,
+                    wss.name,
+                    wss.createdat
                 FROM work_submissions ws
                 INNER JOIN work_submission_statuses wss ON ws.statusid = wss.id
                 WHERE ws.id = @Id";
 
-            var submission = await conn.QuerySingleOrDefaultAsync<WorkSubmissionDetail>(
-                sqlSubmission, 
-                new { Id = id }
+            WorkSubmissionDetail? submission = null;
+
+            var result = await conn.QueryAsync<WorkSubmissionDetail, WorkSubmissionStatus, WorkSubmissionDetail>(
+                sqlSubmission,
+                (workSub, status) =>
+                {
+                    workSub.WorkSubmissionStatus = status;
+                    return workSub;
+                },
+                new { Id = id },
+                splitOn: "id" 
             );
+
+            submission = result.FirstOrDefault();
 
             if (submission == null) return null;
 
             string sqlFiles = @"
-                SELECT wsf.*, sdm.id AS DeliveryMethodId, sdm.name AS Name
+                SELECT 
+                    wsf.id,
+                    wsf.worksubmissionid,
+                    wsf.deliverymethodid,
+                    wsf.fileurl,
+                    sdm.id,
+                    sdm.name,
+                    sdm.createdat
                 FROM work_submission_files wsf
                 INNER JOIN submission_delivery_methods sdm ON wsf.deliverymethodid = sdm.id
                 WHERE wsf.worksubmissionid = @Id";
 
-            var files = (await conn.QueryAsync<WorkSubmissionFile>(sqlFiles, new { Id = id })).ToList();
+            var files = await conn.QueryAsync<WorkSubmissionFile, SubmissionDeliveryMethod, WorkSubmissionFile>(
+                sqlFiles,
+                (file, method) =>
+                {
+                    file.DeliveryMethod = method;
+                    return file;
+                },
+                new { Id = id },
+                splitOn: "id" 
+            );
 
-            submission.Files = files;
+            submission.Files = files.ToList();
 
             return submission;
         }
