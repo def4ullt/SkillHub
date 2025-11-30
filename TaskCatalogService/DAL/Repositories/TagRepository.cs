@@ -19,6 +19,16 @@ namespace DAL.Repositories
             this.context = context;
         }
 
+        public async Task<bool> AreTagsValidAsync(IEnumerable<Guid> tagIds, CancellationToken cancellationToken = default)
+        {
+            List<Guid> existingIds = await context.Tags
+                .Where(t => tagIds.Contains(t.Id))
+                .Select(t => t.Id)
+                .ToListAsync(cancellationToken);
+
+            return existingIds.Count == tagIds.Count();
+        }
+
         public async Task<bool> ExistsByNameAsync(string name, Guid? excludeId = null, CancellationToken cancellationToken = default)
         {
             return await context.Tags

@@ -14,11 +14,11 @@ namespace DAL.DB.EFConfig
 
             builder.Property(t => t.Title)
                    .IsRequired()
-                   .HasMaxLength(200);
+                   .HasMaxLength(200); 
 
             builder.Property(t => t.Description)
                    .IsRequired()
-                   .HasColumnType("text");
+                   .HasMaxLength(2000);
 
             builder.Property(t => t.Difficulty)
                    .IsRequired();
@@ -30,10 +30,10 @@ namespace DAL.DB.EFConfig
                    .IsRequired();
 
             builder.Property(t => t.CreatedAt)
-               .HasConversion(
-                   v => v.ToUniversalTime(),
-                   v => DateTime.SpecifyKind(v, DateTimeKind.Utc))
-               .IsRequired();
+                   .HasConversion(
+                       v => v.ToUniversalTime(),
+                       v => DateTime.SpecifyKind(v, DateTimeKind.Utc))
+                   .IsRequired();
 
             builder.Property(t => t.UpdatedAt)
                    .HasConversion(

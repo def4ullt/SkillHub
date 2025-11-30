@@ -9,6 +9,7 @@ namespace DAL.Repositories.Interfaces
 {
     public interface ITechnologyRepository : IGenericRepository<Technology>
     {
+        Task<bool> AreTechnologiesValidAsync(IEnumerable<Guid> technologyIds, CancellationToken cancellationToken = default);
         Task<bool> ExistsByNameAsync(string name, Guid? excludeId = null, CancellationToken cancellationToken = default);
     }
 }

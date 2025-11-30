@@ -19,6 +19,16 @@ namespace DAL.Repositories
             this.context = context;
         }
 
+        public async Task<bool> AreTechnologiesValidAsync(IEnumerable<Guid> technologyIds, CancellationToken cancellationToken = default)
+        {
+            List<Guid> existingIds = await context.Technologies
+                .Where(t => technologyIds.Contains(t.Id))
+                .Select(t => t.Id)
+                .ToListAsync(cancellationToken);
+
+            return existingIds.Count == technologyIds.Count();
+        }
+
         public async Task<bool> ExistsByNameAsync(string name, Guid? excludeId = null, CancellationToken cancellationToken = default)
         {
             return await context.Technologies
