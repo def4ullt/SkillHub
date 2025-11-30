@@ -10,7 +10,7 @@ namespace DAL.Repositories.Interfaces
 {
     public interface ITaskRepository : IGenericRepository<TaskEntity>
     {
-        Task<IEnumerable<TaskEntity>> GetPagedTasksAsync(TaskQueryParameters parameters, CancellationToken cancellationToken = default);
+        Task<(List<TaskEntity> Items, int TotalCount)> GetPagedTasksAsync(TaskQueryParameters parameters, CancellationToken cancellationToken = default);
         Task<TaskEntity?> GetTaskByIdAsync(Guid id, CancellationToken cancellationToken = default);
     }
 }

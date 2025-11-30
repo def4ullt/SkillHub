@@ -7,6 +7,7 @@ using AutoMapper;
 using BLL.DTO.Task;
 using BLL.Helpers;
 using BLL.Services.Interfaces;
+using DAL.Pagination;
 using DAL.Unit_of_work;
 using Domain.Entities;
 using Domain.Query;
@@ -24,13 +25,15 @@ namespace BLL.Services
             this.mapper = mapper;
         }
 
-        public async Task<List<TaskReadDto>> GetPagedTasksAsync(TaskQueryParameters parameters, CancellationToken cancellationToken = default)
+        public async Task<PagedList<TaskReadDto>> GetPagedTasksAsync(TaskQueryParameters parameters, CancellationToken cancellationToken = default)
         {
-            IEnumerable<TaskEntity> tasks = await unitOfWork.Tasks.GetPagedTasksAsync(parameters, cancellationToken);
-            List<TaskEntity> taskList = tasks.ToList();
-            
-            return mapper.Map<List<TaskReadDto>>(taskList);
+            var (items, totalCount) = await unitOfWork.Tasks.GetPagedTasksAsync(parameters, cancellationToken);
+
+            var dtoItems = mapper.Map<List<TaskReadDto>>(items);
+
+            return new PagedList<TaskReadDto>(dtoItems, totalCount, parameters.Page, parameters.PageSize);
         }
+
 
         public async Task<TaskDetailDto?> GetTaskByIdAsync(Guid id, CancellationToken cancellationToken = default)
         {
@@ -47,12 +50,12 @@ namespace BLL.Services
         {
             if (!await unitOfWork.Technologies.AreTechnologiesValidAsync(dto.TechnologyIds, cancellationToken))
             {
-                throw new NotFoundException("Some of the provided Technology IDs do not exist");
+                throw new NotFoundException("Some of the provided Technology IDs do not exist or duplicated");
             }
 
             if (!await unitOfWork.Tags.AreTagsValidAsync(dto.TagIds, cancellationToken))
             {
-                throw new NotFoundException("Some of the provided Tag IDs do not exist");
+                throw new NotFoundException("Some of the provided Tag IDs do not exist or duplicated");
             }
 
             TaskEntity task = mapper.Map<TaskEntity>(dto);
@@ -72,7 +75,9 @@ namespace BLL.Services
             await unitOfWork.Tasks.AddAsync(task);
             await unitOfWork.SaveChangesAsync(cancellationToken);
 
-            return mapper.Map<TaskDetailDto>(task);
+            TaskEntity? createdTask = await unitOfWork.Tasks.GetTaskByIdAsync(task.Id, cancellationToken);
+
+            return mapper.Map<TaskDetailDto>(createdTask);
         }
 
         public async Task<TaskDetailDto> UpdateTaskAsync(Guid id, TaskUpdateDto dto, CancellationToken cancellationToken = default)
@@ -85,12 +90,12 @@ namespace BLL.Services
 
             if (!await unitOfWork.Technologies.AreTechnologiesValidAsync(dto.TechnologyIds, cancellationToken))
             {
-                throw new NotFoundException("Some of the provided Technology IDs do not exist");
+                throw new NotFoundException("Some of the provided Technology IDs do not exist or duplicated");
             }
 
             if (!await unitOfWork.Tags.AreTagsValidAsync(dto.TagIds, cancellationToken))
             {
-                throw new NotFoundException("Some of the provided Tag IDs do not exist");
+                throw new NotFoundException("Some of the provided Tag IDs do not exist or duplicated");
             }
 
             mapper.Map(dto, existingTask);
@@ -110,7 +115,8 @@ namespace BLL.Services
             await unitOfWork.Tasks.UpdateAsync(existingTask);
             await unitOfWork.SaveChangesAsync(cancellationToken);
 
-            return mapper.Map<TaskDetailDto>(existingTask);
+            TaskEntity? updatedTask = await unitOfWork.Tasks.GetTaskByIdAsync(existingTask.Id, cancellationToken);
+            return mapper.Map<TaskDetailDto>(updatedTask);
         }
 
         public async Task DeleteTaskAsync(Guid id, CancellationToken cancellationToken = default)

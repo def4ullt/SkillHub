@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Ardalis.Specification.EntityFrameworkCore;
 using DAL.DB;
 using DAL.Repositories.Interfaces;
 using DAL.SpecificationPattern;
@@ -21,10 +22,22 @@ namespace DAL.Repositories
             this.context = context;
         }
 
-        public async Task<IEnumerable<TaskEntity>> GetPagedTasksAsync(TaskQueryParameters parameters, CancellationToken cancellationToken = default)
+        public async Task<(List<TaskEntity> Items, int TotalCount)> GetPagedTasksAsync(TaskQueryParameters parameters, CancellationToken cancellationToken = default)
         {
             var spec = new TaskWithFiltersSpecification(parameters);
-            return await ApplySpecification(spec).ToListAsync(cancellationToken);
+            var query = context.Tasks.AsQueryable();
+
+            var specEvaluator = new SpecificationEvaluator();
+            var filteredQuery = specEvaluator.GetQuery(query, spec);
+
+            var totalCount = await filteredQuery.CountAsync(cancellationToken);
+
+            var items = await filteredQuery
+                .Skip((parameters.Page - 1) * parameters.PageSize)
+                .Take(parameters.PageSize)
+                .ToListAsync(cancellationToken);
+
+            return (items, totalCount);
         }
 
         public async Task<TaskEntity?> GetTaskByIdAsync(Guid id, CancellationToken cancellationToken = default)
@@ -34,7 +47,6 @@ namespace DAL.Repositories
                     .ThenInclude(tt => tt.Technology)
                 .Include(t => t.TaskTags)
                     .ThenInclude(tt => tt.Tag)
-                .AsNoTracking()
                 .FirstOrDefaultAsync(t => t.Id == id, cancellationToken);
         }
     }

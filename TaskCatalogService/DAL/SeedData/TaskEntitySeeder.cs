@@ -24,7 +24,7 @@ namespace DAL.SeedData
                 .RuleFor(t => t.XpReward, f => f.Random.Int(10, 200))
                 .RuleFor(t => t.CreatedAt, f => f.Date.Past())
                 .RuleFor(t => t.UpdatedAt, f => f.Date.Recent())
-                .RuleFor(t => t.IsActive, f => true);
+                .RuleFor(t => t.IsActive, f => f.Random.Bool());
 
             await context.Set<TaskEntity>().AddRangeAsync(tasks.Generate(15));
             await context.SaveChangesAsync();
