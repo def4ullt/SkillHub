@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\MicroServices\ReviewService\Domain\ReviewService.Domain.csproj" />
+    <ProjectReference Include="..\..\MicroServices\TaskService\BLL\TaskService.BLL.csproj" />
+    <ProjectReference Include="..\..\MicroServices\WorkService\BLL\WorkService.BLL.csproj" />
+  </ItemGroup>
+
+</Project>

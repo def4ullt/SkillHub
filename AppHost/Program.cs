@@ -32,13 +32,17 @@ var reviewService = builder.AddProject<ReviewService_API>("review-service")
     .WithReference(mongoDB)
     .WaitFor(mongoDB);
 
-var gateway = builder.AddProject<Gateway>("gateway")
+var aggregator = builder.AddProject<Aggregator_API>("aggregator-service")
     .WithReference(taskService)
     .WithReference(workService)
     .WithReference(reviewService)
     .WaitFor(taskService)
     .WaitFor(workService)
     .WaitFor(reviewService);
+
+var gateway = builder.AddProject<Gateway>("gateway")
+    .WithReference(aggregator)
+    .WaitFor(aggregator);
 
 var app = builder.Build();
 await app.RunAsync();

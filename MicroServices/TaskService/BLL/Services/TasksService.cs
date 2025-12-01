@@ -14,12 +14,12 @@ using Domain.Query;
 
 namespace BLL.Services
 {
-    public class TaskService : ITaskService
+    public class TasksService : ITaskService
     {
         private IUnitOfWork unitOfWork;
         private IMapper mapper;
 
-        public TaskService(IUnitOfWork unitOfWork, IMapper mapper)
+        public TasksService(IUnitOfWork unitOfWork, IMapper mapper)
         {
             this.unitOfWork = unitOfWork;
             this.mapper = mapper;

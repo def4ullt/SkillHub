@@ -43,7 +43,7 @@ namespace API.Controllers
         /// <param name="id">Submission identifier.</param>
         /// <param name="cancellationToken">Cancellation token.</param>
         /// <returns>Detailed submission DTO.</returns>
-        [HttpGet("{id}/detail", Name = "GetWorkSubmissionDetail")]
+        [HttpGet("{id}", Name = "GetWorkSubmissionDetail")]
         public async Task<ActionResult<WorkSubmissionDetailDto>> GetDetailAsync(Guid id, CancellationToken cancellationToken = default)
         {
             logger.LogInformation("Retrieving detailed work submission with ID: {Id}", id);

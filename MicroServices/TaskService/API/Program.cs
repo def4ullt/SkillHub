@@ -28,7 +28,7 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 builder.Services.AddScoped<ITagService, TagService>();
 builder.Services.AddScoped<ITechnologyService, TechnologyService>();
-builder.Services.AddScoped<ITaskService, TaskService>();
+builder.Services.AddScoped<ITaskService, TasksService>();
 
 builder.Services.AddAutoMapper(cfg =>
 {
@@ -46,7 +46,7 @@ builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "CatalogService", Version = "v1" });
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "TaskService", Version = "v1" });
 
     string xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
     string xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);

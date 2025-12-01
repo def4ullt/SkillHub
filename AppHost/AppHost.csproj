@@ -18,6 +18,7 @@
 	</ItemGroup>
 	
   <ItemGroup>
+    <ProjectReference Include="..\Aggregator\Aggregator.API\Aggregator.API.csproj" />
     <ProjectReference Include="..\Gateway\Gateway.csproj" />
     <ProjectReference Include="..\MicroServices\ReviewService\API\ReviewService.API.csproj" />
     <ProjectReference Include="..\MicroServices\TaskService\API\TaskService.API.csproj" />
