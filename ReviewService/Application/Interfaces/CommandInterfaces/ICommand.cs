@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using MediatR;
 
-namespace Application.CommandInterfaces
+namespace Application.Interfaces.CommandInterfaces
 {
     public interface ICommand : IRequest<Unit>
     {

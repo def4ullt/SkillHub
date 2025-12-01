@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using MediatR;
 
-namespace Application.QueriesInterfaces
+namespace Application.Interfaces.QueriesInterfaces
 {
     public interface IQuery<out TResponse> : IRequest<TResponse>
     {

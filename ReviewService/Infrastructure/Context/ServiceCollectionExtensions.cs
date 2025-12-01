@@ -1,16 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Infrastructure.Context.Config;
 using Infrastructure.Context.Indexes;
 using Infrastructure.Context.Unit_of_work;
-using MongoDB.Bson.Serialization.Serializers;
-using MongoDB.Bson.Serialization;
 using MongoDB.Bson;
-using Microsoft.Extensions.DependencyInjection;
+using MongoDB.Bson.Serialization;
+using MongoDB.Bson.Serialization.Serializers;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Infrastructure.Context.FakeData;
 
 namespace Infrastructure.Context
@@ -24,17 +20,15 @@ namespace Infrastructure.Context
         {
             ConfigureMongoDbSerialization();
 
-            var connectionString = configuration.GetConnectionString("ClothyReviewsDb");
-
-            MongoDbSettings mongoSettings = new MongoDbSettings
+            var mongoSettings = configuration.GetSection("MongoDbSettings").Get<MongoDbSettings>();
+            if (mongoSettings == null)
             {
-                ConnectionString = connectionString,
-                DatabaseName = "ClothyReviewsDb"
-            };
+                throw new ArgumentNullException(nameof(mongoSettings), "MongoDbSettings section is missing in configuration.");
+            }
+
+            var context = new MongoDbContext(mongoSettings);
 
             services.AddSingleton(mongoSettings);
-
-            MongoDbContext context = new MongoDbContext(mongoSettings);
             services.AddSingleton(context);
 
             services.AddScoped<IUnitOfWork>(sp =>

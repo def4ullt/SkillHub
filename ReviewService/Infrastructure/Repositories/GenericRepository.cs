@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using Domain.Entities;
@@ -19,8 +20,9 @@ namespace Infrastructure.Repositories
         {
             collection = typeof(T).Name switch
             {
-                "Review" => (IMongoCollection<T>)context.TaskReviews,
-                "Question" => (IMongoCollection<T>)context.TaskQuestions,
+                "TaskReview" => (IMongoCollection<T>)context.TaskReviews,
+                "TaskQuestion" => (IMongoCollection<T>)context.TaskQuestions,
+                _ => throw new SwitchExpressionException(typeof(T))
             };
             this.session = session;
         }

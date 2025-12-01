@@ -55,13 +55,5 @@ namespace Infrastructure.Repositories
             long count = await collection.CountDocumentsAsync(filter, cancellationToken: cancellationToken);
             return count > 0;
         }
-
-        public async Task<bool> TaskIdExistsAsync(Guid taskId, CancellationToken cancellationToken = default)
-        {
-            var filterBuilder = Builders<TaskReview>.Filter.Eq(review => review.TaskId, taskId);
-            long count = await collection.CountDocumentsAsync(filterBuilder, cancellationToken: cancellationToken);
-            
-            return count > 0;
-        }
     }
 }

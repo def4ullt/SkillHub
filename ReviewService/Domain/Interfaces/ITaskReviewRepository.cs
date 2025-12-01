@@ -13,6 +13,5 @@ namespace Domain.Interfaces
     {
         Task<bool> HasUserReviewedTaskAsync(Guid userId, Guid taskId, CancellationToken cancellationToken = default);
         Task<PagedList<TaskReview>> GetReviewsAsync(TaskReviewQueryParameters queryParameters, CancellationToken cancellationToken = default);
-        Task<bool> TaskIdExistsAsync(Guid taskId, CancellationToken cancellationToken = default);
     }
 }
