@@ -12,11 +12,14 @@
 	</PropertyGroup>
 	
   <ItemGroup>
+    <PackageReference Include="MassTransit" Version="8.3.6" />
+    <PackageReference Include="MassTransit.RabbitMQ" Version="8.3.6" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\ServiceDefaults\ServiceDefaults.csproj" />
+    <ProjectReference Include="..\..\Contracts\SkillHub.Contracts\SkillHub.Contracts.csproj" />
     <ProjectReference Include="..\BLL\WorkService.BLL.csproj" />
   </ItemGroup>
 

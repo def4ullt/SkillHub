@@ -20,6 +20,12 @@ var mongo = builder.AddMongoDB("SkillHubMongo")
 
 var mongoDB = mongo.AddDatabase("SkillHubReviews");
 
+var mlServicePath = Path.GetFullPath(Path.Combine(builder.AppHostDirectory, "..", "MicroServices", "MLService"));
+
+var mlService = builder.AddExecutable("ml-service", "python", mlServicePath,
+        "-m", "uvicorn", "app:app", "--host", "0.0.0.0", "--port", "5400")
+    .WithHttpEndpoint(port: 5400, name: "http");
+
 var taskService = builder.AddProject<TaskService_API>("task-service")
     .WithReference(taskServiceDB)
     .WaitFor(taskServiceDB);
@@ -30,7 +36,9 @@ var workService = builder.AddProject<WorkService_API>("work-service")
 
 var reviewService = builder.AddProject<ReviewService_API>("review-service")
     .WithReference(mongoDB)
-    .WaitFor(mongoDB);
+    .WithEnvironment("MLService__BaseUrl", mlService.GetEndpoint("http"))
+    .WaitFor(mongoDB)
+    .WaitFor(mlService);
 
 var aggregator = builder.AddProject<Aggregator_API>("aggregator-service")
     .WithReference(taskService)

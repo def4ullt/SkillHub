@@ -15,10 +15,7 @@ namespace BLL.FluentValidation.WorkSubmissionFile
             RuleFor(x => x.DeliveryMethodId)
                 .NotEmpty().WithMessage("DeliveryMethodId is required.");
 
-            RuleFor(x => x.FileUrl)
-                .NotEmpty().WithMessage("FileUrl is required.")
-                .Must(url => Uri.TryCreate(url, UriKind.Absolute, out _))
-                .WithMessage("FileUrl must be a valid URL.");
+           
         }
     }
 }

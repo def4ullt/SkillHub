@@ -47,6 +47,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aggregator.API", "Aggregato
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aggregator.HTTP", "Aggregator\Aggregator.HTTP\Aggregator.HTTP.csproj", "{56203493-9225-473C-B9C1-FE9D47B1A596}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SkillHub.Contracts", "MicroServices\Contracts\SkillHub.Contracts\SkillHub.Contracts.csproj", "{947B09EB-659A-8E38-A693-1AF5983812BF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -121,6 +123,10 @@ Global
 		{56203493-9225-473C-B9C1-FE9D47B1A596}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{56203493-9225-473C-B9C1-FE9D47B1A596}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{56203493-9225-473C-B9C1-FE9D47B1A596}.Release|Any CPU.Build.0 = Release|Any CPU
+		{947B09EB-659A-8E38-A693-1AF5983812BF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{947B09EB-659A-8E38-A693-1AF5983812BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{947B09EB-659A-8E38-A693-1AF5983812BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{947B09EB-659A-8E38-A693-1AF5983812BF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -143,6 +149,7 @@ Global
 		{E05698A4-091D-6CFB-5C2E-764590DA08FC} = {C9A24EA5-94DD-4CAD-BB46-2C2BDE01C670}
 		{B7C96CF5-3C6D-EE98-7999-824AEDD9BA3E} = {C23EBA40-4ECA-4070-9D9A-B945B070CFC7}
 		{56203493-9225-473C-B9C1-FE9D47B1A596} = {C23EBA40-4ECA-4070-9D9A-B945B070CFC7}
+		{947B09EB-659A-8E38-A693-1AF5983812BF} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A0478503-F657-45CA-9F06-ADBD5F3DA539}

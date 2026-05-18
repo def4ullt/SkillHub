@@ -13,12 +13,26 @@ using BLL.FluentValidation.Task;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
 using CatalogService.API.Middleware;
+using MassTransit;
+using SkillHub.Contracts;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
 builder.AddServiceDefaults();
+
+builder.Services.AddMassTransit(x =>
+{
+	x.UsingRabbitMq((context, cfg) =>
+	{
+		cfg.Host("localhost", "/", h =>
+		{
+			h.Username("guest");
+			h.Password("guest");
+		});
+	});
+});
 
 builder.Services.AddScoped<ITagRepository, TagRepository>();
 builder.Services.AddScoped<ITaskRepository, TaskRepository>();

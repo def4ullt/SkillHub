@@ -14,10 +14,29 @@ using BLL.Mapper;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
 using API.Middleware;
+using MassTransit;
+using SkillHub.Contracts;
+using API.Consumers;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
+
+builder.Services.AddMassTransit(x =>
+{
+	x.AddConsumer<TaskCreatedConsumer>();
+
+	x.UsingRabbitMq((context, cfg) =>
+	{
+		cfg.Host("localhost", "/", h =>
+		{
+			h.Username("guest");
+			h.Password("guest");
+		});
+
+		cfg.ConfigureEndpoints(context);
+	});
+});
 
 string? connectionString = builder.Configuration.GetConnectionString("TaskWorkService");
 builder.Services.AddSingleton<IDbConnectionFactory>(new NpgsqlConnectionFactory(connectionString));
@@ -26,12 +45,14 @@ builder.Services.AddScoped<IWorkSubmissionStatusRepository, WorkSubmissionStatus
 builder.Services.AddScoped<ISubmissionDeliveryMethodRepository, SubmissionDeliveryMethodRepository>();
 builder.Services.AddScoped<IWorkSubmissionFileRepository, WorkSubmissionFileRepository>();
 builder.Services.AddScoped<IWorkSubmissionRepository, WorkSubmissionRepository>();
+builder.Services.AddScoped<IUserXpRepository, UserXpRepository>();
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 builder.Services.AddScoped<ISubmissionDeliveryMethodService, SubmissionDeliveryMethodService>();
 builder.Services.AddScoped<IWorkSubmissionStatusService, WorkSubmissionStatusService>();
 builder.Services.AddScoped<IWorkSubmissionService, WorkSubmissionService>();
+builder.Services.AddScoped<IUserXpService, UserXpService>();
 
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddValidatorsFromAssemblyContaining<WorkSubmissionStatusCreateDtoValidator>();

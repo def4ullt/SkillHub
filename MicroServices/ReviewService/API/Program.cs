@@ -10,6 +10,7 @@ using Infrastructure.Context;
 using Infrastructure.Context.FakeData;
 using Infrastructure.Context.Mapping;
 using Infrastructure.Repositories;
+using Infrastructure.Services;
 using MediatR;
 using Microsoft.OpenApi.Models;
 
@@ -24,6 +25,7 @@ builder.Services.AddMongoDb(builder.Configuration);
 
 builder.Services.AddScoped<ITaskReviewRepository, TaskReviewRepository>();
 builder.Services.AddScoped<ITaskQuestionRepository, TaskQuestionRepository>();
+builder.Services.AddSingleton<ISentimentAnalysisService, SentimentAnalysisService>();
 
 builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ExceptionHandlingBehavior<,>));
 builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));

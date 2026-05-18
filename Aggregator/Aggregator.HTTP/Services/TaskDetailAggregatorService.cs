@@ -21,22 +21,40 @@ namespace Aggregator.HTTP.Services
             this.http = http;
         }
 
-        public async Task<TaskDetailResponseDto> GetTaskDetailAsync(Guid taskId)
-        {
-            var taskTask = http.GetFromJsonAsync<TaskDetailDto>($"http://localhost:5000/tasks/tasks/{taskId}");
-            var workTask = http.GetFromJsonAsync<PaginatedResponse<WorkSubmissionReadDto>>($"http://localhost:5000/work/work-submissions/?TaskId={taskId}&Page=1&PageSize=10");
-            var reviewTask = http.GetFromJsonAsync<PaginatedResponse<TaskReviewDto>>($"http://localhost:5000/reviews/reviews/?TaskId={taskId}&Page=1&PageSize=10");
-            var questionTask = http.GetFromJsonAsync<PaginatedResponse<TaskQuestionDto>>($"http://localhost:5000/reviews/questions/?TaskId={taskId}&Page=1&PageSize=10");
+		public async Task<TaskDetailResponseDto> GetTaskDetailAsync(Guid taskId)
+		{
+			var taskResponse = await http.GetAsync($"http://localhost:5015/api/tasks/{taskId}");
 
-            await Task.WhenAll(taskTask, workTask, reviewTask, questionTask);
+			if (!taskResponse.IsSuccessStatusCode)
+				throw new HttpRequestException($"Task {taskId} not found", null, taskResponse.StatusCode);
 
-            return new TaskDetailResponseDto
-            {
-                Task = taskTask.Result!,
-                WorkSubmissions = workTask.Result?.Items ?? new List<WorkSubmissionReadDto>(),
-                Reviews = reviewTask.Result?.Items ?? new List<TaskReviewDto>(),
-                Questions = questionTask.Result?.Items ?? new List<TaskQuestionDto>()
-            };
-        }
-    }
+			var task = await taskResponse.Content.ReadFromJsonAsync<TaskDetailDto>();
+
+			var workTask = http.GetAsync($"http://localhost:5087/api/work-submissions/?TaskId={taskId}&Page=1&PageSize=10");
+			var reviewTask = http.GetAsync($"http://localhost:5293/api/reviews/?TaskId={taskId}&Page=1&PageSize=10");
+			var questionTask = http.GetAsync($"http://localhost:5293/api/questions/?TaskId={taskId}&Page=1&PageSize=10");
+
+			await Task.WhenAll(workTask, reviewTask, questionTask);
+
+			var workSubmissions = (await workTask).IsSuccessStatusCode
+				? await (await workTask).Content.ReadFromJsonAsync<PaginatedResponse<WorkSubmissionReadDto>>()
+				: new PaginatedResponse<WorkSubmissionReadDto>();
+
+			var reviews = (await reviewTask).IsSuccessStatusCode
+				? await (await reviewTask).Content.ReadFromJsonAsync<PaginatedResponse<TaskReviewDto>>()
+				: new PaginatedResponse<TaskReviewDto>();
+
+			var questions = (await questionTask).IsSuccessStatusCode
+				? await (await questionTask).Content.ReadFromJsonAsync<PaginatedResponse<TaskQuestionDto>>()
+				: new PaginatedResponse<TaskQuestionDto>();
+
+			return new TaskDetailResponseDto
+			{
+				Task = task!,
+				WorkSubmissions = workSubmissions?.Items ?? new List<WorkSubmissionReadDto>(),
+				Reviews = reviews?.Items ?? new List<TaskReviewDto>(),
+				Questions = questions?.Items ?? new List<TaskQuestionDto>()
+			};
+		}
+	}
 }

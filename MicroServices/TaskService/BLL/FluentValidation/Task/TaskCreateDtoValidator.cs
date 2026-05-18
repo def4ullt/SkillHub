@@ -17,7 +17,6 @@ namespace BLL.FluentValidation.Task
                 .MaximumLength(200).WithMessage("Title cannot exceed 200 characters");
 
             RuleFor(t => t.Description)
-                .NotEmpty().WithMessage("Description is required")
                 .MaximumLength(2000).WithMessage("Description cannot exceed 2000 characters");
 
             RuleFor(t => t.EstimatedTimeMinutes)
@@ -27,12 +26,8 @@ namespace BLL.FluentValidation.Task
                 .GreaterThanOrEqualTo(0).WithMessage("XP reward must be non-negative");
 
             RuleFor(t => t.TechnologyIds)
-                .NotNull().WithMessage("TechnologyIds cannot be null")
-                .Must(list => list.Count > 0).WithMessage("At least one TechnologyId must be provided");
+                .NotNull().WithMessage("TechnologyIds cannot be null");
 
-            RuleFor(t => t.TagIds)
-                .NotNull().WithMessage("TagIds cannot be null")
-                .Must(list => list.Count > 0).WithMessage("At least one TagId must be provided");
         }
     }
 }

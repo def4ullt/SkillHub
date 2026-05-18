@@ -20,6 +20,9 @@ namespace Application.FluenValidation.Reviews
 
             RuleFor(x => x.Comment)
                 .NotEmpty().WithMessage("Comment is required");
+
+            RuleFor(x => x.RequestingUserId)
+                .NotEmpty().WithMessage("RequestingUserId is required");
         }
     }
 }

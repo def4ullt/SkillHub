@@ -60,8 +60,6 @@ namespace DAL.SpecificationPattern
             Query.Include(t => t.TaskTags)
                  .ThenInclude(tt => tt.Tag);
 
-            Query.Skip((parameters.Page - 1) * parameters.PageSize)
-                 .Take(parameters.PageSize);
         }
     }
 }

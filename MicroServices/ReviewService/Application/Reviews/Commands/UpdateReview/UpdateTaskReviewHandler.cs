@@ -23,9 +23,10 @@ namespace Application.Reviews.Commands.UpdateReview
         {
             var review = await repo.GetByIdAsync(request.ReviewId, cancellationToken);
             if (review == null)
-            {
                 throw new NotFoundException("TaskReview", request.ReviewId);
-            }
+
+            if (!request.IsAdmin && review.User.UserId != request.RequestingUserId)
+                throw new ForbiddenException("You can only edit your own reviews.");
 
             review.UpdateComment(request.Comment, request.Rating);
 

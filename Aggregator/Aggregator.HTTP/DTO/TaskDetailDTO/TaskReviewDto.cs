@@ -11,6 +11,8 @@ namespace Aggregator.HTTP.DTO.TaskDetailDTO
         public string? Id { get; set; }
         public int Rating { get; set; }
         public string? Comment { get; set; }
-        public UserInformationDto? User { get; set; } 
+        public UserInformationDto? User { get; set; }
+        public string? Sentiment { get; set; }
+        public List<string>? KeyIssues { get; set; }
     }
 }

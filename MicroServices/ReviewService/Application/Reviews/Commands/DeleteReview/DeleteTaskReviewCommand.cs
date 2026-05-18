@@ -7,5 +7,9 @@ using Application.Interfaces.CommandInterfaces;
 
 namespace Application.Reviews.Commands.DeleteReview
 {
-    public record DeleteTaskReviewCommand(string ReviewId) : ICommand;
+    public record DeleteTaskReviewCommand(
+        string ReviewId,
+        Guid RequestingUserId,
+        bool IsAdmin = false
+    ) : ICommand;
 }

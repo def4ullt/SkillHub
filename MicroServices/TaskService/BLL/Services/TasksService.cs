@@ -11,6 +11,8 @@ using DAL.Pagination;
 using DAL.Unit_of_work;
 using Domain.Entities;
 using Domain.Query;
+using MassTransit;
+using SkillHub.Contracts;
 
 namespace BLL.Services
 {
@@ -18,11 +20,13 @@ namespace BLL.Services
     {
         private IUnitOfWork unitOfWork;
         private IMapper mapper;
+		private IPublishEndpoint publishEndpoint;
 
-        public TasksService(IUnitOfWork unitOfWork, IMapper mapper)
+		public TasksService(IUnitOfWork unitOfWork, IMapper mapper, IPublishEndpoint publishEndpoint)
         {
             this.unitOfWork = unitOfWork;
             this.mapper = mapper;
+            this.publishEndpoint = publishEndpoint;
         }
 
         public async Task<PagedList<TaskReadDto>> GetPagedTasksAsync(TaskQueryParameters parameters, CancellationToken cancellationToken = default)
@@ -74,8 +78,13 @@ namespace BLL.Services
 
             await unitOfWork.Tasks.AddAsync(task);
             await unitOfWork.SaveChangesAsync(cancellationToken);
+			await publishEndpoint.Publish(new TaskCreated
+			{
+				TaskId = task.Id,
+				TaskName = task.Title ?? string.Empty,
+			}, cancellationToken);
 
-            TaskEntity? createdTask = await unitOfWork.Tasks.GetTaskByIdAsync(task.Id, cancellationToken);
+			TaskEntity? createdTask = await unitOfWork.Tasks.GetTaskByIdAsync(task.Id, cancellationToken);
 
             return mapper.Map<TaskDetailDto>(createdTask);
         }

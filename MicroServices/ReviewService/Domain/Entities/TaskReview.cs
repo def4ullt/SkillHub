@@ -23,6 +23,12 @@ namespace Domain.Entities
         [BsonElement("user")]
         public UserInformation User { get; set; }
 
+        [BsonElement("sentiment")]
+        public string? Sentiment { get; private set; }
+
+        [BsonElement("keyIssues")]
+        public List<string>? KeyIssues { get; private set; }
+
         private TaskReview()
         {
 
@@ -40,6 +46,12 @@ namespace Domain.Entities
         {
             Comment = newComment.Trim();
             Rating = newRating;
+        }
+
+        public void SetSentiment(string sentiment, List<string>? keyIssues)
+        {
+            Sentiment = sentiment;
+            KeyIssues = keyIssues;
         }
     }
 }

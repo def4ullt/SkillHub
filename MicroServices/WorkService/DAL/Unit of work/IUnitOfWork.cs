@@ -15,7 +15,8 @@ namespace DAL.Unit_of_work
         IWorkSubmissionFileRepository WorkSubmissionFiles { get; }
         IWorkSubmissionStatusRepository WorkSubmissionStatuses { get; }
         ISubmissionDeliveryMethodRepository SubmissionDeliveryMethods { get; }
-        IDbConnection Connection { get; }
+		IUserXpRepository UserXp { get; }
+		IDbConnection Connection { get; }
         IDbTransaction? Transaction { get; }
         Task BeginTransactionAsync();
         Task CommitAsync();

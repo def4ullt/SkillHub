@@ -53,6 +53,10 @@ namespace API.Middleware
                     code = HttpStatusCode.NotFound;
                     break;
 
+                case ForbiddenException:
+                    code = HttpStatusCode.Forbidden;
+                    break;
+
                 case AlreadyExistsException:
                     code = HttpStatusCode.Conflict;
                     break;

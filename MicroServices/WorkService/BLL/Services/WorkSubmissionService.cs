@@ -92,6 +92,21 @@ namespace BLL.Services
                 throw new NotFoundException(nameof(WorkSubmissionStatus), dto.StatusId);
             }
 
+            string? oldStatusName = (await unitOfWork.WorkSubmissionStatuses.GetByIdAsync(entity.StatusId, cancellationToken))?.Name;
+            bool wasAlreadyAccepted = IsAcceptedStatus(oldStatusName);
+            bool isNowAccepted = IsAcceptedStatus(status.Name);
+
+            if (isNowAccepted && !wasAlreadyAccepted && entity.XpReward > 0)
+            {
+                var xpEntry = new Domain.Entities.UserXp
+                {
+                    UserId = entity.UserId,
+                    TaskId = entity.TaskId,
+                    XpAmount = entity.XpReward,
+                };
+                await unitOfWork.UserXp.AddAsync(xpEntry, cancellationToken);
+            }
+
             if (dto.Files != null)
             {
                 foreach (WorkSubmissionFileUpdateDto fileDto in dto.Files)
@@ -110,14 +125,14 @@ namespace BLL.Services
 
             WorkSubmission? updated = await unitOfWork.WorkSubmissions.UpdateAsync(entity, cancellationToken);
 
-            List<WorkSubmissionFile> existingFiles = await unitOfWork.WorkSubmissionFiles.GetBySubmissionIdAsync(entity.Id, cancellationToken);
-            foreach (WorkSubmissionFile oldFile in existingFiles)
-            {
-                await unitOfWork.WorkSubmissionFiles.DeleteAsync(oldFile.Id, cancellationToken);
-            }
-
             if (dto.Files != null)
             {
+                List<WorkSubmissionFile> existingFiles = await unitOfWork.WorkSubmissionFiles.GetBySubmissionIdAsync(entity.Id, cancellationToken);
+                foreach (WorkSubmissionFile oldFile in existingFiles)
+                {
+                    await unitOfWork.WorkSubmissionFiles.DeleteAsync(oldFile.Id, cancellationToken);
+                }
+
                 foreach (WorkSubmissionFileUpdateDto fileDto in dto.Files)
                 {
                     WorkSubmissionFile newFile = mapper.Map<WorkSubmissionFile>(fileDto);
@@ -130,6 +145,10 @@ namespace BLL.Services
 
             return mapper.Map<WorkSubmissionReadDto>(updated);
         }
+
+        private static bool IsAcceptedStatus(string? name) =>
+            string.Equals(name, "Approved", StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(name, "Completed", StringComparison.OrdinalIgnoreCase);
 
         public async Task DeleteAsync(Guid id, CancellationToken cancellationToken = default)
         {

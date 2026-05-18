@@ -10,6 +10,8 @@ namespace Application.Reviews.Commands.UpdateReview
     public record UpdateTaskReviewCommand(
         string ReviewId,
         int Rating,
-        string Comment
+        string Comment,
+        Guid RequestingUserId,
+        bool IsAdmin = false
     ) : ICommand;
 }

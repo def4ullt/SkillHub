@@ -23,9 +23,10 @@ namespace Application.Reviews.Commands.DeleteReview
         {
             var review = await repo.GetByIdAsync(request.ReviewId, cancellationToken);
             if (review == null)
-            {
                 throw new NotFoundException("TaskReview", request.ReviewId);
-            }
+
+            if (!request.IsAdmin && review.User.UserId != request.RequestingUserId)
+                throw new ForbiddenException("You can only delete your own reviews.");
 
             await repo.DeleteAsync(request.ReviewId, cancellationToken);
 

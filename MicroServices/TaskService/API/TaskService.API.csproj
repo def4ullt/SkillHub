@@ -12,6 +12,8 @@
 		<PackageReference Include="Aspire.Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.5.2" />
 		<PackageReference Include="Aspire.Hosting.AppHost" Version="9.5.2" />
 		<PackageReference Include="AspNetCore.HealthChecks.NpgSql" Version="8.0.2" />
+		<PackageReference Include="MassTransit" Version="8.3.6" />
+		<PackageReference Include="MassTransit.RabbitMQ" Version="8.3.6" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.11">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -25,6 +27,7 @@
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\..\..\ServiceDefaults\ServiceDefaults.csproj" />
+		<ProjectReference Include="..\..\Contracts\SkillHub.Contracts\SkillHub.Contracts.csproj" />
 		<ProjectReference Include="..\BLL\TaskService.BLL.csproj" />
 	</ItemGroup>
 </Project>
