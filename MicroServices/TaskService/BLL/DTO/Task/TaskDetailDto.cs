@@ -18,6 +18,7 @@ namespace BLL.DTO.Task
         public int EstimatedTimeMinutes { get; set; }
         public int XpReward { get; set; }
         public bool IsActive { get; set; }
+        public Guid AuthorId { get; set; }
         public List<TechnologyReadDto> Technologies { get; set; } = new List<TechnologyReadDto>();
         public List<TagReadDto> Tags { get; set; } = new List<TagReadDto>();
     }

@@ -25,14 +25,16 @@ builder.AddServiceDefaults();
 builder.Services.AddMassTransit(x =>
 {
 	x.AddConsumer<TaskCreatedConsumer>();
+	x.AddConsumer<TaskUpdatedConsumer>();
 
 	x.UsingRabbitMq((context, cfg) =>
 	{
-		cfg.Host("localhost", "/", h =>
-		{
-			h.Username("guest");
-			h.Password("guest");
-		});
+		var config = context.GetRequiredService<IConfiguration>();
+		var connStr = config.GetConnectionString("rabbitmq");
+		if (!string.IsNullOrEmpty(connStr))
+			cfg.Host(new Uri(connStr));
+		else
+			cfg.Host("localhost", "/", h => { h.Username("guest"); h.Password("guest"); });
 
 		cfg.ConfigureEndpoints(context);
 	});
@@ -53,6 +55,12 @@ builder.Services.AddScoped<ISubmissionDeliveryMethodService, SubmissionDeliveryM
 builder.Services.AddScoped<IWorkSubmissionStatusService, WorkSubmissionStatusService>();
 builder.Services.AddScoped<IWorkSubmissionService, WorkSubmissionService>();
 builder.Services.AddScoped<IUserXpService, UserXpService>();
+
+string taskServiceUrl = builder.Configuration["TaskService:BaseUrl"] ?? "http://localhost:5015";
+builder.Services.AddHttpClient<ITaskServiceClient, TaskServiceClient>(client =>
+{
+    client.BaseAddress = new Uri(taskServiceUrl);
+});
 
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddValidatorsFromAssemblyContaining<WorkSubmissionStatusCreateDtoValidator>();

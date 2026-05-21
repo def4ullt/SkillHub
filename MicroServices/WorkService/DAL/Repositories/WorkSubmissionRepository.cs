@@ -15,7 +15,33 @@ namespace DAL.Repositories
     {
         public WorkSubmissionRepository(IDbConnectionFactory connectionFactory) : base(connectionFactory, "work_submissions")
         {
+        }
 
+        public override async Task<Guid> AddAsync(WorkSubmission entity, CancellationToken cancellationToken = default, IDbTransaction? transaction = null)
+        {
+            using var conn = await GetOpenConnectionAsync();
+            const string sql = @"
+                INSERT INTO work_submissions (taskid, taskname, userid, userfirstname, userlastname, statusid, xpreward, submissiondate)
+                VALUES (@TaskId, @TaskName, @UserId, @UserFirstName, @UserLastName, @StatusId, @XpReward, @SubmissionDate)
+                RETURNING id";
+            var id = await conn.ExecuteScalarAsync<Guid>(new CommandDefinition(sql, entity, transaction: transaction, cancellationToken: cancellationToken));
+            entity.Id = id;
+            return id;
+        }
+
+        public override async Task<WorkSubmission?> UpdateAsync(WorkSubmission entity, CancellationToken cancellationToken = default, IDbTransaction? transaction = null)
+        {
+            using var conn = await GetOpenConnectionAsync();
+            const string sql = @"
+                UPDATE work_submissions
+                SET taskid = @TaskId, taskname = @TaskName, userid = @UserId,
+                    userfirstname = @UserFirstName, userlastname = @UserLastName,
+                    statusid = @StatusId, xpreward = @XpReward, submissiondate = @SubmissionDate,
+                    reviewedby = @ReviewedBy, reviewedat = @ReviewedAt
+                WHERE id = @Id
+                RETURNING *";
+            return await conn.QuerySingleOrDefaultAsync<WorkSubmission>(
+                new CommandDefinition(sql, entity, transaction: transaction, cancellationToken: cancellationToken));
         }
 
         public async Task<PagedList<WorkSubmission>> GetPagedAsync(WorkSubmissionQueryParams queryParams, CancellationToken cancellationToken = default)
@@ -49,10 +75,11 @@ namespace DAL.Repositories
 
             int offset = (queryParams.PageNumber - 1) * queryParams.PageSize;
             string dataSql = $@"
-                SELECT * 
-                FROM {tableName} 
-                {whereClause} 
-                {orderClause} 
+                SELECT ws.*, wss.name AS statusname
+                FROM {tableName} ws
+                LEFT JOIN work_submission_statuses wss ON ws.statusid = wss.id
+                {whereClause}
+                {orderClause}
                 LIMIT @PageSize OFFSET @Offset";
 
             parameters.Add("PageSize", queryParams.PageSize);
@@ -128,6 +155,13 @@ namespace DAL.Repositories
             submission.Files = files.ToList();
 
             return submission;
+        }
+
+        public async Task UpdateTaskNameAsync(Guid taskId, string newTaskName, CancellationToken cancellationToken = default)
+        {
+            using var conn = await GetOpenConnectionAsync();
+            string sql = $"UPDATE {tableName} SET taskname = @TaskName WHERE taskid = @TaskId";
+            await conn.ExecuteAsync(new CommandDefinition(sql, new { TaskName = newTaskName, TaskId = taskId }, cancellationToken: cancellationToken));
         }
     }
 }

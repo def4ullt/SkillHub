@@ -45,6 +45,10 @@ namespace DAL.DB.EFConfig
                    .IsRequired()
                    .HasDefaultValue(true);
 
+            builder.Property(t => t.AuthorId)
+                   .IsRequired()
+                   .HasDefaultValue(Guid.Empty);
+
             builder.HasMany(t => t.TaskTechnologies)
                    .WithOne(tt => tt.Task)
                    .HasForeignKey(tt => tt.TaskId)

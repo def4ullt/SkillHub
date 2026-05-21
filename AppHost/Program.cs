@@ -23,22 +23,28 @@ var mongoDB = mongo.AddDatabase("SkillHubReviews");
 var mlServicePath = Path.GetFullPath(Path.Combine(builder.AppHostDirectory, "..", "MicroServices", "MLService"));
 
 var mlService = builder.AddExecutable("ml-service", "python", mlServicePath,
-        "-m", "uvicorn", "app:app", "--host", "0.0.0.0", "--port", "5400")
-    .WithHttpEndpoint(port: 5400, name: "http");
+        "-m", "uvicorn", "app:app", "--host", "0.0.0.0", "--port", "5400");
+
+var rabbit = builder.AddRabbitMQ("rabbitmq")
+    .WithImage("rabbitmq", "3-management")
+    .WithDataVolume("SkillHubRabbitMQData");
 
 var taskService = builder.AddProject<TaskService_API>("task-service")
     .WithReference(taskServiceDB)
-    .WaitFor(taskServiceDB);
+    .WithReference(rabbit)
+    .WaitFor(taskServiceDB)
+    .WaitFor(rabbit);
 
 var workService = builder.AddProject<WorkService_API>("work-service")
     .WithReference(workServiceDB)
-    .WaitFor(workServiceDB);
+    .WithReference(rabbit)
+    .WaitFor(workServiceDB)
+    .WaitFor(rabbit);
 
 var reviewService = builder.AddProject<ReviewService_API>("review-service")
     .WithReference(mongoDB)
-    .WithEnvironment("MLService__BaseUrl", mlService.GetEndpoint("http"))
-    .WaitFor(mongoDB)
-    .WaitFor(mlService);
+    .WithEnvironment("MLService__BaseUrl", "http://localhost:5400")
+    .WaitFor(mongoDB);
 
 var aggregator = builder.AddProject<Aggregator_API>("aggregator-service")
     .WithReference(taskService)

@@ -16,5 +16,6 @@ namespace BLL.DTO.Task
         public int EstimatedTimeMinutes { get; set; }
         public int XpReward { get; set; }
         public bool IsActive { get; set; }
+        public Guid AuthorId { get; set; }
     }
 }

@@ -34,6 +34,8 @@ CREATE TABLE IF NOT EXISTS work_submissions (
 );
 
 ALTER TABLE work_submissions ADD COLUMN IF NOT EXISTS xpreward INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE work_submissions ADD COLUMN IF NOT EXISTS reviewedby UUID;
+ALTER TABLE work_submissions ADD COLUMN IF NOT EXISTS reviewedat TIMESTAMP WITHOUT TIME ZONE;
 
 CREATE TABLE IF NOT EXISTS work_submission_files (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),

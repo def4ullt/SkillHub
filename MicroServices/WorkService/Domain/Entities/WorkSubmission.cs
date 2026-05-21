@@ -15,8 +15,11 @@ namespace Domain.Entities
         public string? UserFirstName { get; set; }
         public string? UserLastName { get; set; } 
         public Guid StatusId { get; set; }
+        public string? StatusName { get; set; }
         public int XpReward { get; set; }
         public WorkSubmissionStatus? WorkSubmissionStatus { get; set; }
         public DateTime SubmissionDate { get; set; }
+        public Guid? ReviewedBy { get; set; }
+        public DateTime? ReviewedAt { get; set; }
     }
 }

@@ -22,7 +22,8 @@ namespace BLL.Mapper
                            opt => opt.MapFrom(src => src.TaskTags.Select(tt => tt.Tag)));
 
             CreateMap<TaskCreateDto, TaskEntity>();
-            CreateMap<TaskUpdateDto, TaskEntity>();
+            CreateMap<TaskUpdateDto, TaskEntity>()
+                .ForMember(dest => dest.AuthorId, opt => opt.Ignore());
         }
     }
 }

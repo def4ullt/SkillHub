@@ -17,6 +17,7 @@ namespace Domain.Entities
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
         public bool IsActive { get; set; }
+        public Guid AuthorId { get; set; }
 
         public ICollection<TaskTechnology> TaskTechnologies { get; set; } = new List<TaskTechnology>();
         public ICollection<TaskTag> TaskTags { get; set; } = new List<TaskTag>();

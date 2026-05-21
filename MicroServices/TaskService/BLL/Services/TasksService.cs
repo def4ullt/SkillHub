@@ -107,7 +107,10 @@ namespace BLL.Services
                 throw new NotFoundException("Some of the provided Tag IDs do not exist or duplicated");
             }
 
+            var originalAuthorId = existingTask.AuthorId;
+            var oldTitle = existingTask.Title;
             mapper.Map(dto, existingTask);
+            existingTask.AuthorId = dto.AuthorId ?? originalAuthorId;
 
             existingTask.TaskTechnologies.Clear();
             foreach (Guid techId in dto.TechnologyIds)
@@ -123,6 +126,15 @@ namespace BLL.Services
 
             await unitOfWork.Tasks.UpdateAsync(existingTask);
             await unitOfWork.SaveChangesAsync(cancellationToken);
+
+            if (!string.Equals(oldTitle, existingTask.Title, StringComparison.Ordinal))
+            {
+                await publishEndpoint.Publish(new TaskUpdated
+                {
+                    TaskId = existingTask.Id,
+                    TaskName = existingTask.Title ?? string.Empty,
+                }, cancellationToken);
+            }
 
             TaskEntity? updatedTask = await unitOfWork.Tasks.GetTaskByIdAsync(existingTask.Id, cancellationToken);
             return mapper.Map<TaskDetailDto>(updatedTask);

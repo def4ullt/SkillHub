@@ -12,5 +12,6 @@ namespace DAL.Repositories.Interfaces
     {
         Task<PagedList<WorkSubmission>> GetPagedAsync(WorkSubmissionQueryParams queryParams, CancellationToken cancellationToken = default);
         Task<WorkSubmissionDetail?> GetDetailAsync(Guid id, CancellationToken cancellationToken = default);
+        Task UpdateTaskNameAsync(Guid taskId, string newTaskName, CancellationToken cancellationToken = default);
     }
 }

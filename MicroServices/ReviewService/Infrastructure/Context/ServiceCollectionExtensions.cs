@@ -42,6 +42,7 @@ namespace Infrastructure.Context
             services.AddSingleton<IIndexCreationService, IndexCreationService>();
             services.AddSingleton<TaskReviewSeeder>();
             services.AddSingleton<TaskQuestionSeeder>();
+            services.AddSingleton<SubmissionReviewSeeder>();
 
             return services;
         }

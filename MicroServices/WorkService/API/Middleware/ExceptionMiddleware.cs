@@ -79,6 +79,10 @@ namespace API.Middleware
                 case ArgumentException:
                     code = HttpStatusCode.BadRequest;
                     break;
+
+                case UnauthorizedAccessException:
+                    code = HttpStatusCode.Forbidden;
+                    break;
             }
 
             context.Response.StatusCode = (int)code;

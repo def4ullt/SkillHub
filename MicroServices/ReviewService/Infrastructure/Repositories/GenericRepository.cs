@@ -22,6 +22,7 @@ namespace Infrastructure.Repositories
             {
                 "TaskReview" => (IMongoCollection<T>)context.TaskReviews,
                 "TaskQuestion" => (IMongoCollection<T>)context.TaskQuestions,
+                "SubmissionReview" => (IMongoCollection<T>)context.SubmissionReviews,
                 _ => throw new SwitchExpressionException(typeof(T))
             };
             this.session = session;

@@ -18,11 +18,13 @@ namespace BLL.Services
     {
         private IUnitOfWork unitOfWork;
         private IMapper mapper;
+        private ITaskServiceClient taskServiceClient;
 
-        public WorkSubmissionService(IUnitOfWork unitOfWork, IMapper mapper)
+        public WorkSubmissionService(IUnitOfWork unitOfWork, IMapper mapper, ITaskServiceClient taskServiceClient)
         {
             this.unitOfWork = unitOfWork;
             this.mapper = mapper;
+            this.taskServiceClient = taskServiceClient;
         }
 
         public async Task<WorkSubmissionReadDto> CreateAsync(WorkSubmissionCreateDto dto, CancellationToken cancellationToken = default)
@@ -96,6 +98,15 @@ namespace BLL.Services
             bool wasAlreadyAccepted = IsAcceptedStatus(oldStatusName);
             bool isNowAccepted = IsAcceptedStatus(status.Name);
 
+            if (isNowAccepted && !wasAlreadyAccepted)
+            {
+                Guid? taskAuthorId = await taskServiceClient.GetTaskAuthorIdAsync(entity.TaskId, cancellationToken);
+                bool authorSet = taskAuthorId.HasValue && taskAuthorId.Value != Guid.Empty;
+                bool isAuthor = authorSet && taskAuthorId!.Value == dto.ApproverId;
+                if (authorSet && !isAuthor && !dto.IsAdmin)
+                    throw new UnauthorizedAccessException("Only the task author or an admin can approve submissions.");
+            }
+
             if (isNowAccepted && !wasAlreadyAccepted && entity.XpReward > 0)
             {
                 var xpEntry = new Domain.Entities.UserXp
@@ -122,6 +133,12 @@ namespace BLL.Services
             }
 
             entity.StatusId = dto.StatusId;
+
+            if (dto.ApproverId != Guid.Empty)
+            {
+                entity.ReviewedBy = dto.ApproverId;
+                entity.ReviewedAt = DateTime.UtcNow;
+            }
 
             WorkSubmission? updated = await unitOfWork.WorkSubmissions.UpdateAsync(entity, cancellationToken);
 

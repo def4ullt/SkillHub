@@ -15,6 +15,7 @@ namespace Infrastructure.Context
         public IMongoClient Client { get; }
         public IMongoCollection<TaskReview> TaskReviews => database.GetCollection<TaskReview>("Reviews");
         public IMongoCollection<TaskQuestion> TaskQuestions => database.GetCollection<TaskQuestion>("Questions");
+        public IMongoCollection<SubmissionReview> SubmissionReviews => database.GetCollection<SubmissionReview>("SubmissionReviews");
 
         public MongoDbContext(MongoDbSettings settings)
         {

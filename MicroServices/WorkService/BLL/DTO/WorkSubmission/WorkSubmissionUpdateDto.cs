@@ -11,5 +11,7 @@ namespace BLL.DTO.WorkSubmission
     {
         public Guid StatusId { get; set; }
         public List<WorkSubmissionFileUpdateDto>? Files { get; set; }
+        public Guid ApproverId { get; set; }
+        public bool IsAdmin { get; set; }
     }
 }

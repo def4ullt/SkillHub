@@ -25,6 +25,7 @@ builder.Services.AddMongoDb(builder.Configuration);
 
 builder.Services.AddScoped<ITaskReviewRepository, TaskReviewRepository>();
 builder.Services.AddScoped<ITaskQuestionRepository, TaskQuestionRepository>();
+builder.Services.AddScoped<ISubmissionReviewRepository, SubmissionReviewRepository>();
 builder.Services.AddSingleton<ISentimentAnalysisService, SentimentAnalysisService>();
 
 builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ExceptionHandlingBehavior<,>));
@@ -66,7 +67,8 @@ using (var scope = app.Services.CreateScope())
     List<IDataSeeder> seeders = new List<IDataSeeder>()
     {
         services.GetRequiredService<TaskReviewSeeder>(),
-        services.GetRequiredService<TaskQuestionSeeder>()
+        services.GetRequiredService<TaskQuestionSeeder>(),
+        services.GetRequiredService<SubmissionReviewSeeder>()
     };
     foreach (var seeder in seeders)
     {
